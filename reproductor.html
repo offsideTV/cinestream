@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor - CineStream</title>
+    <link rel="stylesheet" href="styless.css">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2503/2503508.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+ 
+</head>
+
+<body>
+    <header>
+        <a href="index.html">
+            <img src="https://cdn-icons-png.flaticon.com/512/2503/2503508.png" alt="CineStream Logo" class="logo">
+        </a>
+        <h1>CineStream</h1>
+    </header>
+    
+    <div class="container">
+        <h2>Reproduciendo película</h2>
+    
+        <!-- Contenedor para el iframe -->
+        <div id="video-container">
+            <iframe id="video-iframe" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    
+            <!-- Elementos de error, ocultos por defecto -->
+            <div id="error-message" style="display: none;">
+                <p>Esta película no se puede reproducir (Error 102630).</p>
+            </div>
+            <div id="fallback-link" style="display: none;">
+                <p>Intenta verla directamente aquí:</p>
+                <a id="fallback-url" href="#" target="_blank">Ver película</a>
+            </div>
+        </div>
+        
+   
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Mapa de streams
+            const streams = {
+                "eternauta-ep1": {
+                    "repro1": "https://streamtape.com/e/jW9j16MxOzUzXxr",
+                    "sandbox": true
+                },
+
+               "eternauta-ep2": {
+                    "repro1": "https://streamtape.com/e/v2qq07QlDBt43j6",
+                    "sandbox": true
+                },
+                "eternauta-ep3": {
+                    "repro1": "https://streamtape.com/e/JwMj3e72BAfrzJ",
+                    "sandbox": true
+                },
+                "eternauta-ep4": {
+                    "repro1": "https://streamtape.com/e/QD1gWejQwXc0X2m",
+                    "sandbox": true
+                },
+                "eternauta-ep5": {
+                    "repro1": "https://streamtape.com/e/0zZe7w8x8KHgRr",
+                    "sandbox": true
+                },
+                "eternauta-ep6": {
+                    "repro1": "https://streamtape.com/e/BGGlv0Dbo3hyaJK",
+                    "sandbox": true
+                },
+
+              
+            };
+
+            // Obtener parámetros de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const channel = urlParams.get("ch");
+            const getParam = urlParams.get("get");
+            const iframe = document.getElementById("video-iframe");
+            const errorMessage = document.getElementById("error-message");
+            const fallbackLink = document.getElementById("fallback-link");
+            const fallbackUrl = document.getElementById("fallback-url");
+
+            // Verificación de elementos
+            if (!iframe || !errorMessage || !fallbackLink || !fallbackUrl) {
+                console.error("Uno o más elementos del DOM no se encontraron.");
+                return;
+            }
+
+            // Manejar el canal o el parámetro get
+            let streamUrl = "";
+            if (channel && streams[channel]) {
+                streamUrl = streams[channel]["repro1"];
+                iframe.setAttribute("src", streamUrl);
+                if (streams[channel].sandbox) {
+                    iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
+                } else {
+                    iframe.removeAttribute("sandbox");
+                }
+            } else if (getParam) {
+                let externalUrl = `https://nebunexa.co/cvatt.php?get=${getParam}`;
+                if (getParam === "Rm94X1Nwb3J0c19QcmVtaXVuX0hE") {
+                    externalUrl = `https://nebunexa.co/cvatt2.php?get=${getParam}&start=true`;
+                } else if (["RVNQTjJIRA", "RVNQTjJfQXJn", "RVNQTjM", "RVNQTkhE", "Rm94U3BvcnRzMl9VWQ==", "RXZlbnRvczFIRA"].includes(getParam)) {
+                    externalUrl = `https://nebunexa.co/temp.html?get=${getParam}${urlParams.get("lang") ? "&lang=" + urlParams.get("lang") : ""}`;
+                }
+                streamUrl = externalUrl;
+                iframe.setAttribute("src", streamUrl);
+                iframe.setAttribute("sandbox", "allow-scripts allow-same-origin"); // Aplicar sandbox para getParam
+                fallbackUrl.href = externalUrl;
+                fallbackUrl.textContent = externalUrl;
+            } else {
+                document.getElementById("video-container").innerHTML = '<p>Canal no disponible o desactivado.</p>';
+                return;
+            }
+
+            // Mostrar mensaje de error y enlace de fallback si el iframe no carga
+            iframe.onerror = function () {
+                if (errorMessage && fallbackLink && fallbackUrl) {
+                    errorMessage.style.display = "block";
+                    fallbackLink.style.display = "block";
+                } else {
+                    console.error("Elementos de error o fallback no disponibles.");
+                }
+            };
+
+            // Verificación adicional tras cargar el iframe
+            iframe.onload = function () {
+                if (iframe.contentDocument && iframe.contentDocument.body.textContent.includes("no se puede reproducir")) {
+                    if (errorMessage && fallbackLink && fallbackUrl) {
+                        errorMessage.style.display = "block";
+                        fallbackLink.style.display = "block";
+                    }
+                }
+            };
+
+           
+        });
+    </script>
+    <script>
+       
+       
+        document.getElementById('catalogButton').addEventListener('click', function() {
+            window.location.href = 'index.html'; // Redirige al catálogo
+        });
+
+      
+    </script>
+</body>
+</html>
